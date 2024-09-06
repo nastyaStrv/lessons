@@ -16,12 +16,14 @@ class Shop:
     def get_products(self):
         self.__file_name = 'products.txt'
         file = open(self.__file_name, 'r')
-        pprint(file.read())
+        products = file.read()
         file.close()
+
+        return products
 
     def add(self, *products):
         for i in products:
-            if i.name not in self.__file_name:
+            if i not in self.__file_name:
                 file = open(self.__file_name, 'a')
                 file.write(f'{i}\n')
                 file.close()
