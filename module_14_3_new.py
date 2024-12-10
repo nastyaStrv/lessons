@@ -5,10 +5,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 import asyncio
 
-api = '7898759014:AAG4Nuv9SI0789X4S_n6VEpoaWR93-lf5pY'
+api = ''
 bot = Bot(token=api)
 dp = Dispatcher(bot, storage=MemoryStorage())
-
 
 kb = ReplyKeyboardMarkup(resize_keyboard=True)
 button_info = KeyboardButton(text='Информация')
@@ -18,13 +17,11 @@ kb.insert(button_info)
 kb.add(button_calculate)
 kb.add(button_buy)
 
-
 inline_kb = InlineKeyboardMarkup()
 inline_button_calculate = InlineKeyboardButton(text='Рассчитать норму калорий', callback_data='calories')
 inline_button_formulas = InlineKeyboardButton(text='Формулы расчёта', callback_data='formulas')
 inline_kb.add(inline_button_calculate)
 inline_kb.insert(inline_button_formulas)
-
 
 kb2 = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -40,6 +37,11 @@ class UserState(StatesGroup):
     age = State()
     growth = State()
     weight = State()
+
+
+@dp.message_handler(commands=["start"])
+async def start(message):
+    await message.answer('Привет! Я бот помогающий твоему здоровью.', reply_markup=kb)
 
 
 @dp.message_handler(text='Рассчитать')
@@ -91,31 +93,25 @@ async def send_calories(message, state):
     await state.finish()
 
 
-@dp.message_handler(commands=["start"])
-async def start(message):
-    await message.answer('Привет! Я бот помогающий твоему здоровью.', reply_markup=kb)
-
-
-@dp.message_handler()
-async def all_massages(message):
-    await message.answer('Введите команду /start, чтобы начать общение.')
-
-
 @dp.message_handler(text='Купить')
 async def get_buying_list(message):
     for i in range(1, 5):
-        await message.answer(f'Название {i}| Описание: {i}| Цена: {i*100}')
+        await message.answer(f'Название {i}| Описание: {i}| Цена: {i * 100}')
         path = f'Images_1{i}.jpg'
         with open(path, 'rb') as img:
             await message.answer_photo(img)
     await message.answer('Выберите товар для покупки:', reply_markup=kb2)
 
 
-
 @dp.callback_query_handler(text='product_buying')
 async def send_confirm_message(call):
     await call.message.answer('Вы успешно приобрели продукт!')
     await call.answer()
+
+
+@dp.message_handler()
+async def all_massages(message):
+    await message.answer('Введите команду /start, чтобы начать общение.')
 
 
 if __name__ == "__main__":
